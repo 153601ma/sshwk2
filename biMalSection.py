@@ -20,7 +20,6 @@ args.add_argument("sectionname_projection", help="file to write DOT file to")
 args = args.parse_args()
 network = networkx.Graph()
 
-# search the target directory for valid Windows PE executable files
 for root, dirs, files in os.walk(args.target_path):
     for path in files:
         # # try opening the file with pefile to see if it's really a PE file
@@ -43,16 +42,14 @@ for root, dirs, files in os.walk(args.target_path):
             pprint.pprint(pe_name.sections)
 
 
-# write the dot file to disk
 write_dot(network, args.output_file)
 malware_name = set(n for n, d in network.nodes(data=True) if d['bipartite'] == 0)
 section_name = set(network) - malware_name
 
-# use NetworkX's bipartite network projection function to produce the malware
-# and hostname projections
+
 malware_network = bipartite.projected_graph(network, malware_name)
 sectionname_network = bipartite.projected_graph(network, section_name)
 
-# write the projected networks to disk as specified by the user
+
 write_dot(malware_network, args.malware_projection)
 write_dot(sectionname_network, args.sectionname_projection)
